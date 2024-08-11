@@ -6,7 +6,7 @@ import gtm from "./gtm"
 
 export default defineNuxtConfig({
     loglevel: process.env.NUXT_LOG_LEVEL || 'info',
-    devtools: {enabled: false},
+    devtools: {enabled: true},
     css: ['~/scss/app.scss'],
     modules: [
         '@pinia/nuxt',
@@ -60,6 +60,11 @@ export default defineNuxtConfig({
                 project: "opnform-vue",
             }),
         ],
+        server: {
+            hmr: {
+                clientPort: 3000
+            }
+        }
     },
     tailwindcss: {
         cssPath: ['~/scss/app.scss']
@@ -68,6 +73,9 @@ export default defineNuxtConfig({
         preference: 'light',
         fallback: 'light',
         classPrefix: '',
+    },
+    ui: {
+        icons: ['heroicons', 'material-symbols'],
     },
     sitemap,
     runtimeConfig,

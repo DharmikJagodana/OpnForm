@@ -18,6 +18,9 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_USER = 'user';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -81,7 +84,7 @@ class User extends Authenticatable
     {
         return vsprintf('https://www.gravatar.com/avatar/%s.jpg?s=200&d=%s', [
             md5(strtolower($this->email)),
-            $this->name ? urlencode("https://ui-avatars.com/api/$this->name") : 'mp',
+            $this->name ? urlencode("https://ui-avatars.com/api/$this->name.jpg") : 'mp',
         ]);
     }
 
@@ -217,6 +220,8 @@ class User extends Authenticatable
             foreach ($user->workspaces as $workspace) {
                 if ($workspace->users()->count() == 1) {
                     $workspace->delete();
+                } else {
+                    $workspace->users()->detach($user->id);
                 }
             }
         });

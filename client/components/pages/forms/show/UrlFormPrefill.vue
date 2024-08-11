@@ -78,6 +78,7 @@
             :show-hidden="true"
             :form="form"
             :fields="form.properties"
+            :url-prefill-preview="true"
             @submit="generateUrl"
           >
             <template #submit-btn="{ submitForm }">
@@ -107,9 +108,9 @@
 </template>
 
 <script>
+import ThemeBuilder from "~/lib/forms/themes/ThemeBuilder"
 import FormUrlPrefill from "../../../open/forms/components/FormUrlPrefill.vue"
 import OpenForm from "../../../open/forms/OpenForm.vue"
-import { themes } from "~/lib/forms/form-themes.js"
 
 export default {
   name: "UrlFormPrefill",
@@ -121,11 +122,17 @@ export default {
 
   data: () => ({
     prefillFormData: null,
-    theme: themes.default,
     showUrlFormPrefillModal: false,
   }),
 
-  computed: {},
+  computed: {
+    theme () {
+      return new ThemeBuilder(this.form.theme, {
+        size: this.form.size,
+        borderRadius: this.form.border_radius
+      }).getAllComponents()
+    },
+  },
 
   methods: {
     generateUrl(formData) {

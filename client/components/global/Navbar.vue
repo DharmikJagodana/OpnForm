@@ -23,19 +23,19 @@
         </div>
         <div
           v-if="showAuth"
-          class="hidden md:block ml-auto relative"
+          class="hidden md:flex gap-x-2 ml-auto"
         >
           <NuxtLink
             v-if="$route.name !== 'templates'"
             :to="{ name: 'templates' }"
-            class="text-sm text-gray-600 dark:text-white hover:text-gray-800 cursor-pointer mt-1 mr-8"
+            :class="navLinkClasses"
           >
             Templates
           </NuxtLink>
-          <template v-if="featureBaseEnabled">
+          <template v-if="appStore.featureBaseEnabled">
             <button
               v-if="user"
-              class="text-sm text-gray-600 dark:text-white hidden sm:inline hover:text-gray-800 cursor-pointer mt-1 mr-8"
+              :class="navLinkClasses"
               @click.prevent="openChangelog"
             >
               What's new? <span
@@ -48,34 +48,38 @@
               v-else
               :href="opnformConfig.links.changelog_url"
               target="_blank"
-              class="text-sm text-gray-600 dark:text-white hidden lg:inline hover:text-gray-800 cursor-pointer mt-1 mr-8"
+              :class="navLinkClasses"
             >
               What's new?
             </a>
           </template>
           <NuxtLink
-            v-if="$route.name !== 'ai-form-builder' && user === null"
+            v-if="($route.name !== 'ai-form-builder' && user === null) && (!appStore.selfHosted || appStore.aiFeaturesEnabled)"
             :to="{ name: 'ai-form-builder' }"
-            class="text-sm text-gray-600 dark:text-white hidden lg:inline hover:text-gray-800 cursor-pointer mt-1 mr-8"
+            :class="navLinkClasses"
+            class="hidden lg:inline"
           >
             AI Form Builder
           </NuxtLink>
           <NuxtLink
             v-if="
-              paidPlansEnabled &&
+              (appStore.paidPlansEnabled &&
                 (user === null || (user && workspace && !workspace.is_pro)) &&
-                $route.name !== 'pricing'
+                $route.name !== 'pricing') && !appStore.selfHosted
             "
             :to="{ name: 'pricing' }"
-            class="text-sm text-gray-600 dark:text-white hover:text-gray-800 cursor-pointer mt-1 mr-8"
+            :class="navLinkClasses"
           >
-            <span v-if="user">Upgrade</span>
+            <span
+              v-if="user"
+              class="text-primary"
+            >Upgrade</span>
             <span v-else>Pricing</span>
           </NuxtLink>
 
           <NuxtLink
             :href="helpUrl"
-            class="text-sm text-gray-600 dark:text-white hover:text-gray-800 cursor-pointer mt-1"
+            :class="navLinkClasses"
             target="_blank"
           >
             Help
@@ -90,7 +94,7 @@
           class="block"
         >
           <div class="flex items-center">
-            <div class="ml-3 mr-4 relative">
+            <div class="ml-4 relative">
               <div class="relative inline-block text-left">
                 <dropdown
                   v-if="user"
@@ -100,7 +104,8 @@
                     <button
                       id="dropdown-menu-button"
                       type="button"
-                      class="flex items-center justify-center w-full rounded-md px-4 py-2 text-sm text-gray-700 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
+                      :class="navLinkClasses"
+                      class="flex items-center"
                       dusk="nav-dropdown-button"
                       @click.stop="toggle()"
                     >
@@ -117,7 +122,7 @@
                   <NuxtLink
                     v-if="userOnboarded"
                     :to="{ name: 'home' }"
-                    class="block block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
+                    class="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:no-underline transition-colors hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +144,7 @@
                   <NuxtLink
                     v-if="userOnboarded"
                     :to="{ name: 'templates-my-templates' }"
-                    class="block block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
+                    class="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:no-underline transition-colors hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +165,7 @@
 
                   <NuxtLink
                     :to="{ name: 'settings-profile' }"
-                    class="block block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
+                    class="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:no-underline transition-colors hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
                   >
                     <svg
                       class="w-4 h-4 mr-2"
@@ -188,7 +193,7 @@
                   <NuxtLink
                     v-if="user.moderator"
                     :to="{ name: 'settings-admin' }"
-                    class="block block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
+                    class="block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:no-underline transition-colors hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +214,7 @@
 
                   <a
                     href="#"
-                    class="block block px-4 py-2 text-md text-gray-700 dark:text-white hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
+                    class="block px-4 py-2 text-md text-gray-700 hover:no-underline transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white dark:hover:bg-gray-600 flex items-center"
                     @click.prevent="logout"
                   >
                     <svg
@@ -236,15 +241,17 @@
                   <NuxtLink
                     v-if="$route.name !== 'login'"
                     :to="{ name: 'login' }"
-                    class="text-gray-600 dark:text-white hover:text-gray-800 dark:hover:text-white px-0 sm:px-3 py-2 rounded-md text-sm"
+                    :class="navLinkClasses"
                     active-class="text-gray-800 dark:text-white"
                   >
                     Login
                   </NuxtLink>
 
                   <v-button
+                    v-if="!appStore.selfHosted"
                     v-track.nav_create_form_click
                     size="small"
+                    class="shrink-0"
                     :to="{ name: 'forms-create-guest' }"
                     color="outline-blue"
                     :arrow="true"
@@ -290,6 +297,10 @@ export default {
     }
   },
 
+  data: () => ({
+    navLinkClasses: 'border border-transparent hover:border-gray-200 text-gray-500 hover:text-gray-800 hover:no-underline dark:hover:text-white py-2 px-3 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors w-full md:w-auto text-center md:text-left'
+  }),
+
   computed: {
     helpUrl() {
       return this.opnformConfig.links.help_url
@@ -302,12 +313,6 @@ export default {
     },
     workspace() {
       return this.workspacesStore.getCurrent
-    },
-    paidPlansEnabled() {
-      return this.config.public.paidPlansEnabled
-    },
-    featureBaseEnabled() {
-      return this.config.public.featureBaseOrganization !== null
     },
     showAuth() {
       return this.$route.name && this.$route.name !== "forms-slug"
@@ -330,14 +335,8 @@ export default {
     userOnboarded() {
       return this.user && this.user.has_forms === true
     },
-    hasCrisp() {
-      return (
-        this.config.public.crispWebsiteId &&
-        this.config.public.crispWebsiteId !== ""
-      )
-    },
     hasNewChanges() {
-      if (import.meta.server || !window.Featurebase) return false
+      if (import.meta.server || !window.Featurebase || !this.appStore.featureBaseEnabled) return false
       return window.Featurebase("unviewed_changelog_count") > 0
     },
   },

@@ -11,7 +11,15 @@
               Create an account
             </h2>
             <small>Sign up in less than 2 minutes.</small>
-            <register-form />
+            <template v-if="!appStore.selfHosted || isInvited">
+              <register-form />
+            </template>
+            <div
+              v-else
+              class="my-6 p-3 rounded-lg border border-yellow-600 bg-yellow-200 text-yellow-600"
+            >
+              Registration is not allowed in self host mode.
+            </div>
           </div>
         </div>
         <div class="w-full hidden lg:block lg:w-1/2 md:p-6 mt-8 md:mt-0">
@@ -98,17 +106,24 @@ export default {
     })
 
     definePageMeta({
-      middleware: "guest",
+      middleware: ["self-hosted", "guest"]
     })
 
     defineRouteRules({
       swr: 3600,
     })
+    return {
+      appStore: useAppStore(),
+    }
   },
 
   data: () => ({}),
 
-  computed: {},
+  computed: {
+    isInvited() {
+      return this.$route.query?.email && this.$route.query?.invite_token
+    }
+  },
 
   methods: {},
 }

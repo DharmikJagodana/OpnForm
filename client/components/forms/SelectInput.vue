@@ -33,7 +33,12 @@
       <template #selected="{ option }">
         <template v-if="multiple">
           <div class="flex items-center truncate mr-6">
-            <span class="truncate">
+            <span
+              class="truncate"
+              :class="[
+                theme.SelectInput.fontSize,
+              ]"
+            >
               {{ getOptionNames(selectedValues).join(', ') }}
             </span>
           </div>
@@ -45,7 +50,13 @@
             :option-name="getOptionName(option)"
           >
             <div class="flex items-center truncate mr-6">
-              <div>{{ getOptionName(option) }}</div>
+              <div
+                :class="[
+                  theme.SelectInput.fontSize,
+                ]"
+              >
+                {{ getOptionName(option) }}
+              </div>
             </div>
           </slot>
         </template>
@@ -57,8 +68,13 @@
           :selected="selected"
         >
           <span class="flex">
-            <p class="flex-grow">
-              {{ option.name }}
+            <p
+              class="flex-grow"
+              :class="[
+                theme.SelectInput.fontSize,
+              ]"
+            >
+              {{ getOptionName(option) }}
             </p>
             <span
               v-if="selected"
@@ -109,25 +125,25 @@ export default {
     dropdownClass: { type: String, default: 'w-full' },
     remote: { type: Function, default: null }
   },
-  setup (props, context) {
+  setup(props, context) {
     return {
       ...useFormInput(props, context)
     }
   },
-  data () {
+  data() {
     return {
       additionalOptions: [],
       selectedValues: []
     }
   },
   computed: {
-    finalOptions () {
+    finalOptions() {
       return this.options.concat(this.additionalOptions)
     }
   },
   watch: {
     compVal: {
-      handler (newVal, oldVal) {
+      handler(newVal, oldVal) {
         if (!oldVal) {
           this.handleCompValChanged()
         }
@@ -135,32 +151,35 @@ export default {
       immediate: false
     }
   },
-  mounted () {
+  mounted() {
     this.handleCompValChanged()
   },
   methods: {
-    getOptionName (val) {
+    getOptionName(val) {
+      if (val == null) return ''
       const option = this.finalOptions.find((optionCandidate) => {
-        return optionCandidate[this.optionKey] === val
+        return optionCandidate && optionCandidate[this.optionKey] === val ||
+          (typeof val === 'object' && val && optionCandidate && optionCandidate[this.optionKey] === val[this.optionKey])
       })
-      if (option) return option[this.displayKey]
-      return null
+      if (option && option[this.displayKey] !== undefined) {
+        return option[this.displayKey]
+      }
+      return val.toString() // Convert to string to ensure it's not null
     },
-    getOptionNames (values) {
-      return values.map(val => {
-        return this.getOptionName(val)
-      })
+    getOptionNames(values) {
+      if (!Array.isArray(values)) return []
+      return values.map(val => this.getOptionName(val)).filter(Boolean)
     },
-    updateModelValue (newValues) {
+    updateModelValue(newValues) {
       if (newValues === null) newValues = []
       this.selectedValues = newValues
     },
-    updateOptions (newItem) {
+    updateOptions(newItem) {
       if (newItem) {
         this.additionalOptions.push(newItem)
       }
     },
-    handleCompValChanged () {
+    handleCompValChanged() {
       if (this.compVal) {
         this.selectedValues = this.compVal
       }

@@ -9,6 +9,7 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsModerator;
 use App\Http\Middleware\IsNotSubscribed;
 use App\Http\Middleware\IsSubscribed;
+use App\Http\Middleware\SelfHostedCredentialsMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -58,6 +59,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            SelfHostedCredentialsMiddleware::class,
             ImpersonationMiddleware::class,
         ],
     ];

@@ -7,7 +7,11 @@
     <VueSignaturePad
       ref="signaturePad"
       :class="[
-        theme.default.input,
+        theme.SignatureInput.input,
+        theme.SignatureInput.spacing.horizontal,
+        theme.SignatureInput.spacing.vertical,
+        theme.SignatureInput.fontSize,
+        theme.SignatureInput.borderRadius,
         {
           '!ring-red-500 !ring-2 !border-transparent': hasError,
           '!cursor-not-allowed !bg-gray-200': disabled,

@@ -31,14 +31,13 @@
 
       <!-- Remember Me -->
       <div class="relative flex items-center my-5">
-        <v-checkbox
+        <CheckboxInput
           v-model="remember"
           class="w-full md:w-1/2"
           name="remember"
           size="small"
-        >
-          Remember me
-        </v-checkbox>
+          label="Remember me"
+        />
 
         <div class="w-full md:w-1/2 text-right">
           <a
@@ -59,7 +58,10 @@
         Log in to continue
       </v-button>
 
-      <p class="text-gray-500 mt-4">
+      <p
+        v-if="!appStore.selfHosted"
+        class="text-gray-500 mt-4"
+      >
         Don't have an account?
         <a
           v-if="isQuick"
@@ -100,6 +102,7 @@ export default {
   emits: ['afterQuickLogin', 'openRegister'],
   setup() {
     return {
+      appStore: useAppStore(),
       authStore: useAuthStore(),
       formsStore: useFormsStore(),
       workspaceStore: useWorkspacesStore(),
@@ -143,7 +146,11 @@ export default {
           this.redirect()
         })
         .catch((error) => {
-          console.error(error)
+          if (error.response?._data?.message == "You must change your credentials when in self host mode") {
+            // this.showForgotModal = true
+            this.redirect()
+          }
+
         })
         .finally(() => {
           this.loading = false

@@ -1,5 +1,8 @@
 <template>
-  <div class="flex flex-col">
+  <div
+    id="public-form"
+    class="flex flex-col"
+  >
     <div v-if="form && !isIframe && (form.logo_picture || form.cover_picture)">
       <div v-if="form.cover_picture">
         <div
@@ -69,7 +72,6 @@
 </template>
 
 <script setup>
-import {computed} from 'vue'
 import OpenCompleteForm from "~/components/open/forms/OpenCompleteForm.vue"
 import sha256 from 'js-sha256'
 import { onBeforeRouteLeave } from 'vue-router'
