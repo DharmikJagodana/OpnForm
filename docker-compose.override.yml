@@ -1,0 +1,10 @@
+---
+services:
+  api:
+    image: opnform-api:local
+
+  api-worker: 
+    image: opnform-api:local
+
+  ui:
+    image: opnform-ui:local
